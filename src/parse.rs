@@ -225,12 +225,10 @@ impl Parser {
         let (key, arch) = split_key_arch(key_arch);
 
         if value.is_none() {
-            return if self.has_pkg {
+            if self.has_pkg {
                 self.add_override(key, arch);
-                Ok(())
-            } else {
-                Err(ErrorKind::EmptyValue(key.to_string()))
-            };
+            }
+            return Ok(());
         }
 
         if has_override(&self.empty_overrides, key, arch) {
