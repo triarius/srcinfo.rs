@@ -659,8 +659,14 @@ mod tests {
 
     #[test]
     fn error_missing_field() {
-        let res = include_str!("../tests/srcinfo/no_arch").parse::<Srcinfo>();
-        assert!(res.is_ok());
+        let err = include_str!("../tests/srcinfo/no_arch")
+            .parse::<Srcinfo>()
+            .unwrap_err();
+        assert_eq!(err.line, None);
+        match err.kind {
+            ErrorKind::MissingField(ref key) => assert_eq!(key, "arch"),
+            _ => panic!("{:?}", err),
+        }
 
         let err = include_str!("../tests/srcinfo/no_pkgrel")
             .parse::<Srcinfo>()
@@ -731,20 +737,17 @@ mod tests {
         let err = include_str!("../tests/srcinfo/no_value")
             .parse::<Srcinfo>()
             .unwrap_err();
-        assert_eq!(err.line.as_ref().unwrap().number, 3);
-
         match err.kind {
-            ErrorKind::EmptyValue(ref key) => assert_eq!(key, "pkgver"),
+            ErrorKind::MissingField(ref key) => assert_eq!(key, "pkgver"),
             _ => panic!("{:?}", err),
         }
 
         let err = include_str!("../tests/srcinfo/no_value2")
             .parse::<Srcinfo>()
             .unwrap_err();
-        assert_eq!(err.line.as_ref().unwrap().number, 2);
 
         match err.kind {
-            ErrorKind::EmptyValue(ref key) => assert_eq!(key, "arch"),
+            ErrorKind::MissingField(ref key) => assert_eq!(key, "arch"),
             _ => panic!("{:?}", err),
         }
     }
