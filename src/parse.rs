@@ -144,6 +144,8 @@ impl Parser {
     }
 
     fn check_missing(&self) -> Result<(), ErrorKind> {
+        // Per https://man.archlinux.org/man/PKGBUILD.5#OPTIONS_AND_DIRECTIVES,
+        // pkgname, pkgver, pkgrel, and arch are required.
         Err(ErrorKind::MissingField(
             if self.srcinfo.base.pkgbase.is_empty() {
                 "pkgbase"
@@ -153,6 +155,10 @@ impl Parser {
                 "pkgver"
             } else if self.srcinfo.base.pkgrel.is_empty() {
                 "pkgrel"
+            } else if self.srcinfo.pkg.arch.is_empty()
+                && self.srcinfo.pkgs.iter().any(|p| p.arch.is_empty())
+            {
+                "arch"
             } else {
                 return Ok(());
             }
