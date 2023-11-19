@@ -750,6 +750,9 @@ mod tests {
             ErrorKind::MissingField(ref key) => assert_eq!(key, "arch"),
             _ => panic!("{:?}", err),
         }
+
+        let result = include_str!("../tests/srcinfo/no_value3").parse::<Srcinfo>();
+        assert!(result.is_ok());
     }
 
     #[test]
